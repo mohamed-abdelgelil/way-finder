@@ -126,11 +126,11 @@ Build an AI-powered Egypt travel assistant using the Strands Agents SDK with Ama
     - Ensure agent responds in natural conversational language
     - _Requirements: 6.1, 6.2, 6.3, 9.1, 9.2, 9.3_
 
-- [-] 9. Checkpoint - Ensure tool modules are importable and notebook structure is complete
+- [x] 9. Checkpoint - Ensure tool modules are importable and notebook structure is complete
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 10. Wire all components together and verify integration
-  - [~] 10.1 Ensure all tool modules are importable from the notebook
+- [x] 10. Wire all components together and verify integration
+  - [x] 10.1 Ensure all tool modules are importable from the notebook
     - Verify import paths work correctly between notebook and tool modules
     - Verify agent can call each tool and receive formatted responses
     - Test session memory persists user preferences across multiple agent calls
@@ -142,7 +142,7 @@ Build an AI-powered Egypt travel assistant using the Strands Agents SDK with Ama
     - Test tool selection for different query types
     - _Requirements: 6.1, 6.2, 6.3_
 
-- [~] 11. Final checkpoint - Ensure all tests pass
+- [x] 11. Final checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes
