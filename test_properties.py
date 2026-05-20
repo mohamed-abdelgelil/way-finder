@@ -173,9 +173,10 @@ class TestProperty3AgentErrorsProduceFiveHundred:
 
         # Assert the generated error message text does NOT appear in the response body.
         # We only check messages that wouldn't naturally appear as a substring of the
-        # generic error response (short random strings like "r" or "e" trivially match).
+        # generic error response or the JSON envelope (short random strings like "r",
+        # "e", or "{" trivially match JSON structure or the generic message).
         response_text = response.text
-        if error_message not in _GENERIC_ERROR_MSG:
+        if len(error_message) > 3 and error_message not in _GENERIC_ERROR_MSG:
             assert error_message not in response_text
 
         # Assert "Traceback" does NOT appear in the response body
