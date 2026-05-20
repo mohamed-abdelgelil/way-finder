@@ -304,6 +304,9 @@
         const MAX_MESSAGE_LENGTH = 2000;
         const SESSION_STORAGE_KEY = 'egypt_travel_session_id';
 
+        // Determine base URL for API calls (handles Jupyter proxy paths)
+        const BASE_URL = window.location.pathname.replace(/\/$/, '');
+
         // Session ID management
         function getSessionId() {
             return localStorage.getItem(SESSION_STORAGE_KEY);
@@ -419,7 +422,7 @@
                     body.session_id = sessionId;
                 }
 
-                const response = await fetch('/chat', {
+                const response = await fetch(BASE_URL + '/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(body),
