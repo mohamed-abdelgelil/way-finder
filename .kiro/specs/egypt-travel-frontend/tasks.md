@@ -6,7 +6,7 @@ Build a chat-style web interface for the Egypt Travel Agent. The implementation 
 
 ## Tasks
 
-- [ ] 1. Set up backend project structure and dependencies
+- [x] 1. Set up backend project structure and dependencies
   - [x] 1.1 Create the session manager module
     - Create `session_manager.py` with the `SessionStore` class
     - Implement `create_session()` that instantiates a Strands Agent with BedrockModel (model_id="anthropic.claude-sonnet-4-6", region_name="us-west-2") and the existing tools (get_destinations, get_destination_details, get_hotels, get_restaurants, get_activities, plan_trip)
@@ -16,7 +16,7 @@ Build a chat-style web interface for the Egypt Travel Agent. The implementation 
     - Include the Egypt travel system prompt matching the notebook's agent configuration
     - _Requirements: 2.1, 2.2, 2.3, 2.5, 2.6_
 
-  - [-] 1.2 Create the FastAPI application with POST /chat endpoint
+  - [x] 1.2 Create the FastAPI application with POST /chat endpoint
     - Create `app.py` with FastAPI app, CORS middleware (allow all origins), and Pydantic models (ChatRequest, ChatResponse, ErrorResponse)
     - Implement `POST /chat` endpoint that validates the request, looks up or creates a session, calls the agent with asyncio.wait_for (60s timeout), and returns the response
     - Return HTTP 400 for missing/empty/whitespace-only message or message exceeding 2000 characters
@@ -27,11 +27,11 @@ Build a chat-style web interface for the Egypt Travel Agent. The implementation 
     - Mount static files directory and serve `static/index.html` at the root route
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 2.2, 2.3, 2.4, 2.5_
 
-- [~] 2. Checkpoint - Verify backend
+- [x] 2. Checkpoint - Verify backend
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 3. Implement the chat frontend
-  - [~] 3.1 Create the HTML structure and CSS styles
+- [x] 3. Implement the chat frontend
+  - [x] 3.1 Create the HTML structure and CSS styles
     - Create `static/index.html` with the chat container, chat header ("Egypt Travel Agent"), chat window, and input area (text input + character count + send button)
     - Style user messages right-aligned with a distinct background color, agent messages left-aligned with a different background color, and error messages with a red/warning background color
     - Add responsive CSS: full-width layout below 768px viewport, centered max-width 800px layout at 768px and above
@@ -40,7 +40,7 @@ Build a chat-style web interface for the Egypt Travel Agent. The implementation 
     - Display a timestamp alongside each message
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 6.1, 6.2, 6.3, 6.4_
 
-  - [~] 3.2 Implement JavaScript chat logic
+  - [x] 3.2 Implement JavaScript chat logic
     - Implement session ID management using `localStorage` (store and retrieve session_id)
     - Implement `sendMessage()`: validate input (non-empty, non-whitespace, ≤2000 chars), display user message optimistically, clear input, disable input/button, show loading indicator, send POST /chat with message and session_id, handle response
     - Implement message rendering: append message elements to chat window with role-based styling (user/agent/error/welcome), include formatted timestamp, auto-scroll to bottom
@@ -49,7 +49,7 @@ Build a chat-style web interface for the Egypt Travel Agent. The implementation 
     - Implement loading indicator: show a typing/loading element in the chat window while waiting for response
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8_
 
-  - [~] 3.3 Implement error handling and welcome experience
+  - [x] 3.3 Implement error handling and welcome experience
     - Handle API error responses (4xx/5xx): display error message in chat window with distinct styling, remove loading indicator, re-enable input
     - Handle network errors (fetch failure): display "Unable to connect to the server. Check your connection." in chat window
     - Handle timeout (30s client-side): use AbortController, abort fetch after 30 seconds, display timeout error message
@@ -59,11 +59,11 @@ Build a chat-style web interface for the Egypt Travel Agent. The implementation 
     - Retain welcome message in chat history after first user message
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 7.1, 7.2, 7.3, 7.4, 7.5_
 
-- [~] 4. Checkpoint - Verify frontend integration
+- [x] 4. Checkpoint - Verify frontend integration
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 5. Backend unit tests
-  - [~] 5.1 Write unit tests for session manager
+- [x] 5. Backend unit tests
+  - [x] 5.1 Write unit tests for session manager
     - Create `test_session_manager.py` using unittest
     - Test `create_session()` returns a valid UUID string
     - Test `get_session()` returns an Agent for a valid session
@@ -72,7 +72,7 @@ Build a chat-style web interface for the Egypt Travel Agent. The implementation 
     - Test `cleanup_expired()` removes only expired sessions
     - _Requirements: 2.1, 2.3, 2.5, 2.6_
 
-  - [~] 5.2 Write unit tests for the /chat endpoint
+  - [x] 5.2 Write unit tests for the /chat endpoint
     - Create `test_app.py` using unittest and FastAPI's TestClient
     - Test valid message returns 200 with response and session_id fields
     - Test missing message field returns 400
@@ -87,49 +87,49 @@ Build a chat-style web interface for the Egypt Travel Agent. The implementation 
     - Test CORS headers are present in response
     - _Requirements: 1.1, 1.4, 1.5, 1.6, 1.7, 2.3, 2.4, 2.5_
 
-- [~] 6. Checkpoint - Ensure all tests pass
+- [x] 6. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 7. Property-based tests
-  - [ ]* 7.1 Write property test for valid request response structure (Property 1)
+- [x] 7. Property-based tests
+  - [x]* 7.1 Write property test for valid request response structure (Property 1)
     - **Property 1: Valid request produces structured response**
     - Use hypothesis to generate random valid strings (1-2000 chars, non-whitespace-only)
     - Mock the Agent to return a string response
     - Assert HTTP 200, response contains non-empty "response" field and valid UUID "session_id" field
     - **Validates: Requirements 1.1**
 
-  - [ ]* 7.2 Write property test for invalid input rejection (Property 2)
+  - [x]* 7.2 Write property test for invalid input rejection (Property 2)
     - **Property 2: Invalid input produces 400 error**
     - Use hypothesis to generate payloads with missing "message", empty "message", or whitespace-only "message"
     - Assert HTTP 400 with "error" field in response
     - **Validates: Requirements 1.6**
 
-  - [ ]* 7.3 Write property test for agent error handling (Property 3)
+  - [x]* 7.3 Write property test for agent error handling (Property 3)
     - **Property 3: Agent errors produce 500 response**
     - Use hypothesis to generate random exception types and messages
     - Mock the Agent to raise the generated exception
     - Assert HTTP 500 with "error" field, assert traceback text is NOT in response body
     - **Validates: Requirements 1.5**
 
-  - [ ]* 7.4 Write property test for session creation on missing/invalid IDs (Property 4)
+  - [x]* 7.4 Write property test for session creation on missing/invalid IDs (Property 4)
     - **Property 4: Session creation for missing or invalid identifiers**
     - Use hypothesis to generate random non-UUID strings and None values for session_id
     - Assert response contains a valid UUID session_id and new_session is true
     - **Validates: Requirements 2.3, 2.5**
 
-  - [ ]* 7.5 Write property test for session ID consistency (Property 5)
+  - [x]* 7.5 Write property test for session ID consistency (Property 5)
     - **Property 5: Session ID consistency**
     - Create a session, then use hypothesis to generate random messages sent with that session_id
     - Assert response session_id matches the request session_id
     - **Validates: Requirements 2.4**
 
-  - [ ]* 7.6 Write property test for session isolation (Property 6)
+  - [x]* 7.6 Write property test for session isolation (Property 6)
     - **Property 6: Session isolation**
     - Create two sessions, send random messages to each
     - Assert that messages to one session do not appear in the other session's history
     - **Validates: Requirements 2.1, 2.2**
 
-- [~] 8. Final checkpoint - Ensure all tests pass
+- [x] 8. Final checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes

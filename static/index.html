@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Egypt Travel Agent</title>
+    <style>
+        /* Reset and base styles */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        /* Chat container */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Chat header */
+        .chat-header {
+            padding: 16px 20px;
+            background-color: #1a5276;
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        /* Chat window - scrollable message area */
+        .chat-window {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Message base styles */
+        .message {
+            display: flex;
+            flex-direction: column;
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        /* User messages - right aligned */
+        .message-user {
+            align-self: flex-end;
+            background-color: #d4e6f1;
+            color: #1a3a4a;
+            border-bottom-right-radius: 4px;
+        }
+
+        /* Agent messages - left aligned */
+        .message-agent {
+            align-self: flex-start;
+            background-color: #eafaf1;
+            color: #1a3a2a;
+            border-bottom-left-radius: 4px;
+        }
+
+        /* Error messages */
+        .message-error {
+            align-self: flex-start;
+            background-color: #fdedec;
+            color: #922b21;
+            border-left: 4px solid #e74c3c;
+            border-bottom-left-radius: 4px;
+        }
+
+        /* Welcome message - styled like agent */
+        .message-welcome {
+            align-self: flex-start;
+            background-color: #eafaf1;
+            color: #1a3a2a;
+            border-bottom-left-radius: 4px;
+        }
+
+        /* Message text */
+        .message-text {
+            font-size: 16px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        /* Timestamp */
+        .message-timestamp {
+            font-size: 11px;
+            color: #888;
+            margin-top: 6px;
+            align-self: flex-end;
+        }
+
+        .message-error .message-timestamp {
+            color: #c0392b;
+        }
+
+        /* Loading indicator */
+        .loading-indicator {
+            display: none;
+            align-self: flex-start;
+            padding: 12px 16px;
+            background-color: #eafaf1;
+            border-radius: 12px;
+            border-bottom-left-radius: 4px;
+        }
+
+        .loading-indicator.visible {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #1a5276;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .loading-dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .loading-dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        .loading-dot:nth-child(3) {
+            animation-delay: 0s;
+        }
+
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0);
+            }
+            40% {
+                transform: scale(1);
+            }
+        }
+
+        /* Input area */
+        .input-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border-top: 1px solid #e0e0e0;
+            background-color: #fafafa;
+            flex-shrink: 0;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        #messageInput {
+            width: 100%;
+            padding: 12px 14px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.2s;
+            min-height: 44px;
+        }
+
+        #messageInput:focus {
+            border-color: #1a5276;
+        }
+
+        #messageInput:disabled {
+            background-color: #f0f0f0;
+            cursor: not-allowed;
+        }
+
+        .char-count {
+            font-size: 12px;
+            color: #888;
+            text-align: right;
+            padding-right: 4px;
+        }
+
+        .char-count.over-limit {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+
+        #sendButton {
+            padding: 12px 20px;
+            min-width: 44px;
+            min-height: 44px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            background-color: #1a5276;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            flex-shrink: 0;
+        }
+
+        #sendButton:hover:not(:disabled) {
+            background-color: #1f6d9b;
+        }
+
+        #sendButton:disabled {
+            background-color: #a0b4c4;
+            cursor: not-allowed;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 767px) {
+            .chat-container {
+                max-width: 100%;
+                box-shadow: none;
+            }
+
+            .message {
+                max-width: 90%;
+            }
+
+            #messageInput {
+                min-height: 44px;
+                padding: 12px;
+            }
+
+            #sendButton {
+                min-width: 44px;
+                min-height: 44px;
+                padding: 12px 16px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .chat-container {
+                max-width: 800px;
+                margin: 0 auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">Egypt Travel Agent</div>
+        <div class="chat-window" id="chatWindow">
+            <!-- Loading indicator (hidden by default, shown by JS) -->
+            <div class="loading-indicator" id="loadingIndicator">
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+            </div>
+        </div>
+        <div class="input-area">
+            <div class="input-wrapper">
+                <input
+                    type="text"
+                    id="messageInput"
+                    placeholder="Ask about Egypt travel..."
+                    maxlength="2000"
+                    autocomplete="off"
+                    aria-label="Type your message"
+                >
+                <span class="char-count" id="charCount">0/2000</span>
+            </div>
+            <button id="sendButton" disabled aria-label="Send message">Send</button>
+        </div>
+    </div>
+
+    <script>
+        // DOM elements
+        const chatWindow = document.getElementById('chatWindow');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const charCount = document.getElementById('charCount');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+
+        const MAX_MESSAGE_LENGTH = 2000;
+        const SESSION_STORAGE_KEY = 'egypt_travel_session_id';
+
+        // Session ID management
+        function getSessionId() {
+            return localStorage.getItem(SESSION_STORAGE_KEY);
+        }
+
+        function setSessionId(sessionId) {
+            localStorage.setItem(SESSION_STORAGE_KEY, sessionId);
+        }
+
+        // Format timestamp
+        function formatTimestamp(date) {
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // Render a message in the chat window
+        function renderMessage(role, text) {
+            const messageEl = document.createElement('div');
+            messageEl.classList.add('message', `message-${role}`);
+
+            const textEl = document.createElement('div');
+            textEl.classList.add('message-text');
+            textEl.textContent = text;
+
+            const timestampEl = document.createElement('div');
+            timestampEl.classList.add('message-timestamp');
+            timestampEl.textContent = formatTimestamp(new Date());
+
+            messageEl.appendChild(textEl);
+            messageEl.appendChild(timestampEl);
+
+            // Insert before loading indicator so it stays at the bottom
+            chatWindow.insertBefore(messageEl, loadingIndicator);
+            scrollToBottom();
+        }
+
+        // Auto-scroll chat window to bottom
+        function scrollToBottom() {
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        // Show/hide loading indicator
+        function showLoading() {
+            loadingIndicator.classList.add('visible');
+            scrollToBottom();
+        }
+
+        function hideLoading() {
+            loadingIndicator.classList.remove('visible');
+        }
+
+        // Enable/disable input controls
+        function setInputEnabled(enabled) {
+            messageInput.disabled = !enabled;
+            sendButton.disabled = !enabled;
+            if (enabled) {
+                updateSendButtonState();
+            }
+        }
+
+        // Update send button state based on input content
+        function updateSendButtonState() {
+            const text = messageInput.value;
+            const trimmed = text.trim();
+            const isOverLimit = text.length > MAX_MESSAGE_LENGTH;
+            sendButton.disabled = trimmed.length === 0 || isOverLimit;
+        }
+
+        // Update character count display
+        function updateCharCount() {
+            const length = messageInput.value.length;
+            charCount.textContent = `${length}/${MAX_MESSAGE_LENGTH}`;
+
+            if (length > MAX_MESSAGE_LENGTH) {
+                charCount.classList.add('over-limit');
+            } else {
+                charCount.classList.remove('over-limit');
+            }
+        }
+
+        // Validate message input
+        function isValidMessage(text) {
+            const trimmed = text.trim();
+            return trimmed.length > 0 && text.length <= MAX_MESSAGE_LENGTH;
+        }
+
+        // Send message to backend
+        async function sendMessage() {
+            const text = messageInput.value;
+
+            if (!isValidMessage(text)) {
+                return;
+            }
+
+            // Display user message optimistically
+            renderMessage('user', text);
+
+            // Clear input and disable controls
+            messageInput.value = '';
+            updateCharCount();
+            setInputEnabled(false);
+
+            // Show loading indicator
+            showLoading();
+
+            // Set up AbortController with 30-second timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+            try {
+                const body = { message: text };
+                const sessionId = getSessionId();
+                if (sessionId) {
+                    body.session_id = sessionId;
+                }
+
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body),
+                    signal: controller.signal,
+                });
+
+                clearTimeout(timeoutId);
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    // Hide loading
+                    hideLoading();
+
+                    // Update session ID if new session
+                    if (data.new_session || !getSessionId()) {
+                        setSessionId(data.session_id);
+                    }
+
+                    // Display agent response
+                    renderMessage('agent', data.response);
+                } else {
+                    // API error (4xx/5xx)
+                    let errorText = 'An unexpected error occurred. Please try again.';
+                    try {
+                        const data = await response.json();
+                        if (data.error) {
+                            errorText = data.error;
+                        }
+                    } catch (parseError) {
+                        // Response body wasn't valid JSON, use default message
+                    }
+
+                    // Hide loading
+                    hideLoading();
+
+                    // Display error from API
+                    renderMessage('error', errorText);
+                }
+            } catch (error) {
+                clearTimeout(timeoutId);
+
+                // Hide loading
+                hideLoading();
+
+                // Display network/connection error
+                if (error.name === 'AbortError') {
+                    renderMessage('error', 'Request timed out. Please try again.');
+                } else {
+                    renderMessage('error', 'Unable to connect to the server. Check your connection.');
+                }
+            } finally {
+                // Re-enable input
+                setInputEnabled(true);
+                messageInput.focus();
+            }
+        }
+
+        // Event listeners
+        messageInput.addEventListener('input', () => {
+            updateCharCount();
+            updateSendButtonState();
+        });
+
+        sendButton.addEventListener('click', sendMessage);
+
+        messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if (!sendButton.disabled) {
+                    sendMessage();
+                }
+            }
+        });
+
+        // Display welcome message for new users
+        function showWelcomeMessage() {
+            const sessionId = localStorage.getItem(SESSION_STORAGE_KEY);
+            if (!sessionId) {
+                renderMessage('welcome', 'Welcome to the Egypt Travel Agent! I can help you explore destinations, find hotels, discover restaurants, browse activities, and plan complete trips across Egypt. Ask me anything about traveling in Egypt!');
+            }
+        }
+
+        // Initialize
+        updateCharCount();
+        updateSendButtonState();
+        showWelcomeMessage();
+    </script>
+</body>
+</html>
